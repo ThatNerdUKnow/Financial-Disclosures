@@ -4,11 +4,22 @@ export async function paginateAndScrape(page) {
     console.log("Enumerating every Financial Disclosure Document")
 
     await page.waitForSelector(PAGINATOR_SELECTOR);
-    let paginator = await page.$(PAGINATOR_SELECTOR);
-    await paginator.screenshot({ path: './paginator.png' })
-    await getEveryRecordOnPage(page)
-    await advancePage(paginator)
 
+    let currentPage = 1;
+    let lastPage = await getLastPage(page);
+
+    let records = [];
+
+    while(currentPage <= lastPage)
+    {
+    process.stdout.write(`Enumerating records on page ${currentPage} of ${lastPage}\r`)
+    let pageRecords = await getEveryRecordOnPage(page)
+    records = records.concat(pageRecords);
+    await advancePage(page)
+    currentPage +=1;
+    }
+
+    
 }
 
 async function getEveryRecordOnPage(page) {
@@ -34,21 +45,27 @@ async function getEveryRecordOnPage(page) {
                 disclosureURL,
             })
         })
-
-        console.log(records)
         return records;
-
-
-
     }, SEARCH_TABLE_SELECTOR)
-
     return recordsOnPage;
+}
+
+async function advancePage(page) {
+
+    let nextSelector = PAGINATOR_SELECTOR + " a.next"
+
+    await page.evaluate((selector)=>{
+        document.querySelector(selector).click()
+    },nextSelector)
 
 }
 
-async function advancePage(paginator) {
-
-    let nextButton = await paginator.$('.next')
-    await nextButton.click()
-
+async function getLastPage(page)
+{
+    let lastSelector = PAGINATOR_SELECTOR + " span a"
+    let last = await page.evaluate((selector)=>{
+        let last = document.querySelectorAll(selector)[5].innerText;
+        return last
+    },lastSelector)
+    return last
 }
