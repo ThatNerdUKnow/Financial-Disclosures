@@ -1,9 +1,6 @@
 import puppeteer from 'puppeteer';
 import {paginateAndScrape} from './scraper.js'
-
-const SEARCH_LINK_SELECTOR = 'li > a[href="#Search"]'
-const SUBMIT_BUTTON_SELECTOR = 'button[type="submit"]'
-const SEARCH_TABLE_SELECTOR = "#search-result table"
+import {SEARCH_LINK_SELECTOR,SEARCH_TABLE_SELECTOR,SUBMIT_BUTTON_SELECTOR} from './globals.js'
 
 const url = 'https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDisclosure';
 
@@ -35,7 +32,7 @@ const url = 'https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDiscl
     await paginateAndScrape(page,SEARCH_TABLE_SELECTOR);
 
 
-    await browser.close();
+    //await browser.close();
 
 
 })()
