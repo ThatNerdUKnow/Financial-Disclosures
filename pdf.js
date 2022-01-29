@@ -4,11 +4,6 @@ import path from 'path'
 import _ from 'lodash'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid'
-import { createHmac } from "crypto"
-
-(async () => {
-    await downloadAndProcessPDF('https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/2022/20020208.pdf')
-})()
 
 async function processPDF(pdfPath) {
     let basename = path.basename(pdfPath, '.pdf')
@@ -55,13 +50,16 @@ async function processPDF(pdfPath) {
     })
 }
 
-async function downloadAndProcessPDF(url) {
+export async function downloadAndProcessPDF(url) {
     let { data } = await axios.get(url, {
         responseType: 'arraybuffer',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/pdf'
         }
+    }).catch(e=>{
+        console.log(e);
+        throw `Can't retrieve ${url}`
     })
     let id = "./pdf/" + uuid() + ".pdf"
     await fs.writeFile(id, data);

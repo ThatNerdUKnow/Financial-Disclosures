@@ -3,10 +3,11 @@ import { paginateAndScrape } from './scraper.js'
 import { SEARCH_LINK_SELECTOR, SEARCH_TABLE_SELECTOR, SUBMIT_BUTTON_SELECTOR } from './globals.js'
 import { promises as fs } from 'fs'
 import _ from 'lodash'
+import {downloadAndProcessPDF} from './pdf.js'
 
 const url = 'https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDisclosure';
 
-(async () => {
+async function getFinancialDisclosures() {
 
     console.log("Loading Records")
 
@@ -65,15 +66,17 @@ const url = 'https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDiscl
     
     // Image Processing
 
-    for(record in newRecords)
+    
+    for(let record in newRecords)
     {
         // Download PDF and Process into seperate JPEGs
+        downloadAndProcessPDF(record)
     }
 
     // Post to Twitter*/
 
     
-})()
+}
 
 async function navigateToForm(page) {
     console.log("Getting to disclosure list");
@@ -91,3 +94,6 @@ async function navigateToForm(page) {
     await page.waitForSelector(SEARCH_TABLE_SELECTOR, { visible: true, timeout: 0 })
     console.log("Disclosure list populated")
 }
+
+getFinancialDisclosures()
+setInterval(getFinancialDisclosures,3600000)
