@@ -12,13 +12,14 @@ export async function paginateAndScrape(page) {
 
     while(currentPage <= lastPage)
     {
-    process.stdout.write(`Enumerating records on page ${currentPage} of ${lastPage}\r`)
+    process.stdout.write(`Processing page ${currentPage} of ${lastPage}\r`)
     let pageRecords = await getEveryRecordOnPage(page)
     records = records.concat(pageRecords);
     await advancePage(page)
     currentPage +=1;
     }
 
+    return records;
     
 }
 
