@@ -6,9 +6,15 @@ const EXAMPLE_URL = 'https://disclosures-clerk.house.gov/public_disc/financial-p
 describe('pdf.js/ downloadAndProcessPDF()',()=>{
     it('Should return a value',(done)=>{
         downloadAndProcessPDF(EXAMPLE_URL).then((value)=>{
-            console.log("TEST")
             assert.ok(value)
             done()
         })
     })
+
+    it('Errors out when given a bad url',(done)=>{
+        downloadAndProcessPDF("").catch((e)=>{
+            done()
+        })
+    })
+
 })

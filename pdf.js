@@ -56,10 +56,6 @@ async function processPDF(pdfPath) {
 
                 let output = { pdf: pdfPath, images }
 
-                // Returns a value
-                console.log(output)
-
-                // Returns undefined???
                 resolve(output)
             }
         })
@@ -88,7 +84,5 @@ export async function downloadAndProcessPDF(url) {
     // tell processPDF to process the pdf in the ./pdf directory with the given filename
     let pdfData = await processPDF(id);
 
-    // Returns undefined???
-    console.log(pdfData)
     return pdfData
 }
