@@ -24,23 +24,8 @@ async function getFinancialDisclosures() {
     {
         console.log(e)
     }
-    
-    
-/*
-    console.log("Launching Browser")
-    const browser = await puppeteer.launch({
-        defaultViewport: { width: 1920, height: 1080 },
-        headless: true
-    });
-    console.log("Getting Page Context")
-    const page = await browser.newPage();
-    console.log(`Navigating to ${url}`)
-    await page.goto(url, { waitUntil: 'networkidle2' });
-
-    await navigateToForm(page)*/
 
     let latestRecords = await paginateAndScrape();
-    //browser.close();
 
     latestRecords = _.keyBy(latestRecords, (o) => {
         return o.disclosureURL
@@ -64,8 +49,6 @@ async function getFinancialDisclosures() {
 
     
     // Image Processing
-
-    
     for(let record in newRecords)
     {
         // Download PDF and Process into seperate JPEGs
@@ -75,23 +58,6 @@ async function getFinancialDisclosures() {
     // Post to Twitter*/
 
     
-}
-
-async function navigateToForm(page) {
-    console.log("Getting to disclosure list");
-    await page.click(SEARCH_LINK_SELECTOR)
-
-    console.log("Waiting for search form")
-    await page.waitForSelector(SUBMIT_BUTTON_SELECTOR)
-
-    await page.click(SUBMIT_BUTTON_SELECTOR)
-
-
-    console.log("Waiting for render")
-
-
-    await page.waitForSelector(SEARCH_TABLE_SELECTOR, { visible: true, timeout: 0 })
-    console.log("Disclosure list populated")
 }
 
 getFinancialDisclosures()
