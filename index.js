@@ -26,7 +26,7 @@ async function getFinancialDisclosures() {
     }
     
     
-
+/*
     console.log("Launching Browser")
     const browser = await puppeteer.launch({
         defaultViewport: { width: 1920, height: 1080 },
@@ -37,16 +37,15 @@ async function getFinancialDisclosures() {
     console.log(`Navigating to ${url}`)
     await page.goto(url, { waitUntil: 'networkidle2' });
 
-    await navigateToForm(page)
+    await navigateToForm(page)*/
 
-    let latestRecords = await paginateAndScrape(page, SEARCH_TABLE_SELECTOR);
-    browser.close();
+    let latestRecords = await paginateAndScrape();
+    //browser.close();
 
     latestRecords = _.keyBy(latestRecords, (o) => {
         return o.disclosureURL
     })
 
-    console.log('')
     console.log("Writing to FS")
     await fs.writeFile('./records.json', JSON.stringify(latestRecords))
 
