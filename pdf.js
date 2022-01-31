@@ -11,53 +11,60 @@ async function processPDF(pdfPath) {
 
     console.log(`Converting ${pdfPath}`)
 
-    // Take PDF file and generate individual JPG files
-    await im.convert(["-density", 300, pdfPath, outputPath],async (err) => {
 
-        if (err) {
-            console.log(err)
-            throw `Couldn't Process ${pdfPath}`
-        }
-        else {
+    // Promisify the callback of im.convert()
+    let images = await new Promise((resolve, reject) => {
 
-            // Get every file in Temporary Image Directory
-            let files = await fs.readdir(`./img/`)
+        // Take PDF file and generate individual JPG files
+        im.convert(["-density", 300, pdfPath, outputPath], async (err) => {
 
-            // Append directory into filenames
-            files = files.map(file => {
-                return "./img/" + file
-            })
+            if (err) {
+                console.log(err)
+                reject(err)
+                throw `Couldn't Process ${pdfPath}`
+            }
+            else {
 
-            // We only want the files that match the source pdf's name
-            files = files.filter((file) => {
-                return file.includes(basename)
-            })
+                // Get every file in Temporary Image Directory
+                let files = await fs.readdir(`./img/`)
 
-            console.log(`Getting ${basename} Buffer Data`)
+                // Append directory into filenames
+                files = files.map(file => {
+                    return "./img/" + file
+                })
 
-            // For each file, read and return the buffer data along with the path
-           let images = await Promise.all(files.map(async file => {
-                const contents = await fs.readFile(file)
-                return { path: file, buffer: contents }
-            }))
+                // We only want the files that match the source pdf's name
+                files = files.filter((file) => {
+                    return file.includes(basename)
+                })
 
-            // Since we read the files asynchonously, Reorder the files
-            images = _.orderBy(images, (image) => {
-                let regex = /\d*.jpg/
-                let res = image.path.match(regex)[0]
-                res = path.basename(res, '.jpg')
-                return res
-            })
-            
-            let output = { pdf: pdfPath, images }
+                console.log(`Getting ${basename} Buffer Data`)
 
-            // Returns a value
-            console.log(output)
+                // For each file, read and return the buffer data along with the path
+                let images = await Promise.all(files.map(async file => {
+                    const contents = await fs.readFile(file)
+                    return { path: file, buffer: contents }
+                }))
 
-            // Returns undefined???
-            return output
-        }
+                // Since we read the files asynchonously, Reorder the files
+                images = _.orderBy(images, (image) => {
+                    let regex = /\d*.jpg/
+                    let res = image.path.match(regex)[0]
+                    res = path.basename(res, '.jpg')
+                    return res
+                })
+
+                let output = { pdf: pdfPath, images }
+
+                // Returns a value
+                console.log(output)
+
+                // Returns undefined???
+                resolve(output)
+            }
+        })
     })
+    return images
 }
 
 export async function downloadAndProcessPDF(url) {
@@ -69,7 +76,7 @@ export async function downloadAndProcessPDF(url) {
             'Content-Type': 'application/json',
             'Accept': 'application/pdf'
         }
-    }).catch(e=>{
+    }).catch(e => {
         console.log(e);
         throw `Can't retrieve ${url}`
     })
