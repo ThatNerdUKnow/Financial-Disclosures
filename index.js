@@ -70,7 +70,7 @@ async function getFinancialDisclosures() {
     for(let record in newRecords)
     {
         // Download PDF and Process into seperate JPEGs
-        downloadAndProcessPDF(record)
+        await downloadAndProcessPDF(record)
     }
 
     // Post to Twitter*/
