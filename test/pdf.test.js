@@ -5,7 +5,7 @@ import fs from 'fs'
 const EXAMPLE_URL = 'https://disclosures-clerk.house.gov/public_disc/financial-pdfs/2010/8144403.pdf';
 
 describe('pdf.js/ downloadAndProcessPDF()', () => {
-    let result = downloadAndProcessPDF(EXAMPLE_URL)
+    let result = downloadAndProcessPDF({disclosureURL: EXAMPLE_URL})
 
     it('Should not fail', async () => {
         return result

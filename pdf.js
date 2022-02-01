@@ -63,8 +63,10 @@ async function processPDF(pdfPath) {
     return images
 }
 
-export async function downloadAndProcessPDF(url) {
+export async function downloadAndProcessPDF(record) {
 
+    let url = record.disclosureURL;
+    
     // Fetch PDF from server
     let { data } = await axios.get(url, {
         responseType: 'arraybuffer',

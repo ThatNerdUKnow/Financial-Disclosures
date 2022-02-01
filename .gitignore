@@ -4,3 +4,4 @@ node_modules
 records.json
 img/*
 pdf/*
+.env

@@ -4,6 +4,9 @@ import { SEARCH_LINK_SELECTOR, SEARCH_TABLE_SELECTOR, SUBMIT_BUTTON_SELECTOR } f
 import { promises as fs } from 'fs'
 import _ from 'lodash'
 import {downloadAndProcessPDF} from './pdf.js'
+import os from 'os'
+
+
 
 const url = 'https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDisclosure';
 
@@ -49,12 +52,24 @@ async function getFinancialDisclosures() {
 
     
     // Image Processing
-    for(let record in newRecords)
-    {
-        // Download PDF and Process into seperate JPEGs
-        await downloadAndProcessPDF(record)
-    }
 
+    // Get number of cpu cores on host
+    const CORES = os.cpus().length
+
+    // Convert newRecords to array
+    newRecords = Object.values(newRecords);
+
+    // Split newRecords into chunks of size (how many cores the system has)
+    newRecords = _.chunk(newRecords,CORES)
+
+    await newRecords.reduce(async(memo,chunk)=>{
+        await memo
+        await Promise.all(chunk.map(async record=>{
+            await downloadAndProcessPDF(record)
+        }))
+    },undefined)
+
+   
     // Post to Twitter*/
 
     
