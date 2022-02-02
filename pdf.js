@@ -16,7 +16,7 @@ async function processPDF(pdfPath) {
     let images = await new Promise((resolve, reject) => {
 
         // Take PDF file and generate individual JPG files
-        im.convert(["-density", 300, pdfPath, outputPath], async (err) => {
+        im.convert(["-density", 300, "-quality", 80, pdfPath, outputPath], async (err) => {
 
             if (err) {
                 console.log(err)
@@ -66,7 +66,7 @@ async function processPDF(pdfPath) {
 export async function downloadAndProcessPDF(record) {
 
     let url = record.disclosureURL;
-    
+
     // Fetch PDF from server
     let { data } = await axios.get(url, {
         responseType: 'arraybuffer',
