@@ -15,7 +15,7 @@ async function getFinancialDisclosures() {
 
     console.log("Loading Records")
 
-    let records = await fs.readFile('./records.json').catch(e => {
+    let records = await fs.readFile('./config/records.json').catch(e => {
         console.log("Couldn't load previous records, Starting new")
         return {}
     })
@@ -36,7 +36,7 @@ async function getFinancialDisclosures() {
     })
 
     console.log("Writing to FS")
-    await fs.writeFile('./records.json', JSON.stringify(latestRecords))
+    await fs.writeFile('./config/records.json', JSON.stringify(latestRecords))
 
     
     let newRecords = _.pickBy(latestRecords, record => {

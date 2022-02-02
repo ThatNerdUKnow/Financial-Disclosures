@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid'
 
 async function processPDF(pdfPath) {
     let basename = path.basename(pdfPath, '.pdf')
-    let outputPath = "./img/" + basename + ".jpg";
+    let outputPath = "./config/img/" + basename + ".jpg";
 
     console.log(`Converting ${pdfPath}`)
 
@@ -26,11 +26,11 @@ async function processPDF(pdfPath) {
             else {
 
                 // Get every file in Temporary Image Directory
-                let files = await fs.readdir(`./img/`)
+                let files = await fs.readdir(`./config/img/`)
 
                 // Append directory into filenames
                 files = files.map(file => {
-                    return "./img/" + file
+                    return "./config/img/" + file
                 })
 
                 // We only want the files that match the source pdf's name
@@ -85,7 +85,7 @@ export async function downloadAndProcessPDF(record) {
     })
 
     // Generate a Unique ID for the pdf since this is called asynchronously, this will be called many times simultaneously
-    let id = "./pdf/" + uuid() + ".pdf"
+    let id = "./config/pdf/" + uuid() + ".pdf"
     await fs.writeFile(id, data);
 
     // tell processPDF to process the pdf in the ./pdf directory with the given filename
