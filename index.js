@@ -5,6 +5,7 @@ import { promises as fs } from 'fs'
 import _ from 'lodash'
 import {downloadAndProcessPDF} from './pdf.js'
 import os from 'os'
+import {postDisclosure} from './twitter.js'
 
 
 
@@ -51,28 +52,24 @@ async function getFinancialDisclosures() {
     })
 
     
-    // Image Processing
-
     // Get number of cpu cores on host
     const CORES = os.cpus().length
 
-    // Convert newRecords to array
-    newRecords = Object.values(newRecords);
-
     // Split newRecords into chunks of size (how many cores the system has)
-    newRecords = _.chunk(newRecords,CORES)
+    let recordChunks = _.chunk(Object.values(newRecords),CORES)
 
-    await newRecords.reduce(async(memo,chunk)=>{
+    await recordChunks.reduce(async(memo,chunk)=>{
         await memo
         await Promise.all(chunk.map(async record=>{
-            await downloadAndProcessPDF(record)
+            newRecords[record.disclosureURL].pdfRecord = await downloadAndProcessPDF(record)
         }))
     },undefined)
 
    
     // Post to Twitter*/
-
-    
+    Object.values(newRecords).forEach(record=>{
+        postDisclosure(record)
+    })
 }
 
 getFinancialDisclosures()

@@ -63,6 +63,11 @@ async function processPDF(pdfPath) {
     return images
 }
 
+/**
+ * 
+ * @param {Disclosure} record - A disclosure record from the house
+ * @returns {Object} - {pdf: String, images: { path: String, buffer: Buffer}}
+ */
 export async function downloadAndProcessPDF(record) {
 
     let url = record.disclosureURL;

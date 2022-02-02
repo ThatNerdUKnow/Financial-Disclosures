@@ -12,16 +12,18 @@ const client = new Twitter({
 })
 
 export async function sendTweet(record) {
-    
+
     // I know this looks like garbage
     // What this line does is extract each media id string from record.media_ids
     // And then chunks them into groups of four since we can only attach four photos per tweet
-    let media_chunks = _.chunk(record.media_ids.map(media => { return media.media_id_string }), 4)
+    let media_chunks = _.chunk(record.media_ids.map(media => {
+        return media.media_id_string
+    }), 4)
 
     // Wait for all tweets
     console.log(`Posting to Twitter`)
     await Promise.all(media_chunks.map(async (media_ids, i) => {
-        let status = {}
+        let status = {status: ""}
         status.media_ids = media_ids.toString()
         let isMultiPart = (media_chunks.length > 1) ? true : false
 
@@ -29,7 +31,7 @@ export async function sendTweet(record) {
             status.status = `[${i + 1}/${media_chunks.length}]\n`
         }
 
-        status.status += "Nothing to see here"
+        //status.status += "Nothing to see here"
 
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
@@ -45,10 +47,10 @@ export async function sendTweet(record) {
     console.log('Posted to twitter')
 }
 
-export async function uploadPhotos(buffers) {
-    buffers = buffers.map(async buffer => {
+export async function uploadPhotos(images) {
+    let buffers = images.map(async image => {
         return new Promise((resolve, reject) => {
-            client.post('media/upload', { media: buffer }, (e, media) => {
+            client.post('media/upload', { media: image.buffer }, (e, media) => {
                 if (e) {
                     reject(e)
                 }
@@ -61,4 +63,12 @@ export async function uploadPhotos(buffers) {
 
     let mediaIds = await Promise.all(buffers)
     return mediaIds
+}
+
+
+export async function postDisclosure(record) {
+    console.log(record)
+    let buffers = record.pdfRecord.images;
+    record.media_ids = await uploadPhotos(buffers)
+    return await sendTweet(record)
 }
