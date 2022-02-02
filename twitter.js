@@ -11,26 +11,14 @@ const client = new Twitter({
     access_token_secret: process.env.ACCESS_TOKEN_SECRET
 })
 
-const duckPaths = ['./duck1.jpg', './duck2.jpg', 'duck3.jpg', 'duck4.jpg', 'duck5.jpg', 'duck6.jpg', 'duck7.jpg']
-
-let buffers = await Promise.all(duckPaths.map(async duck => {
-    return fs.readFile(duck);
-}))
-
-let tweetThis = {}
-tweetThis.media_ids = await uploadPhotos(buffers)
-
-sendTweet(tweetThis)
-
 export async function sendTweet(record) {
-    // Build text response
-    // Send pictures
-
+    
     // I know this looks like garbage
     // What this line does is extract each media id string from record.media_ids
     // And then chunks them into groups of four since we can only attach four photos per tweet
     let media_chunks = _.chunk(record.media_ids.map(media => { return media.media_id_string }), 4)
 
+    // Wait for all tweets
     await Promise.all(media_chunks.map(async (media_ids, i) => {
         let status = {}
         status.media_ids = media_ids.toString()
@@ -38,9 +26,6 @@ export async function sendTweet(record) {
 
         if (isMultiPart) {
             status.status = `[${i + 1}/${media_chunks.length}]\n`
-        }
-        else {
-            status.status = "Nothing to see here\n"
         }
 
         status.status += "Nothing to see here"
@@ -57,18 +42,12 @@ export async function sendTweet(record) {
             })
         })
     }))
-
-    /*
-    client.post('statuses/update', status, (e, data) => {
-        console.log(e, data)
-    })*/
 }
 
 export async function uploadPhotos(buffers) {
     buffers = buffers.map(async buffer => {
-        // Get name
         return new Promise((resolve, reject) => {
-            client.post('media/upload', { media: buffer }, (e, media, response) => {
+            client.post('media/upload', { media: buffer }, (e, media) => {
                 if (e) {
                     reject(e)
                 }
