@@ -19,6 +19,7 @@ export async function sendTweet(record) {
     let media_chunks = _.chunk(record.media_ids.map(media => { return media.media_id_string }), 4)
 
     // Wait for all tweets
+    console.log(`Posting to Twitter`)
     await Promise.all(media_chunks.map(async (media_ids, i) => {
         let status = {}
         status.media_ids = media_ids.toString()
@@ -29,7 +30,6 @@ export async function sendTweet(record) {
         }
 
         status.status += "Nothing to see here"
-        console.log(status)
 
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
@@ -42,6 +42,7 @@ export async function sendTweet(record) {
             })
         })
     }))
+    console.log('Posted to twitter')
 }
 
 export async function uploadPhotos(buffers) {
