@@ -33,6 +33,7 @@ export async function sendTweet(record) {
 
         //status.status += "Nothing to see here"
 
+        status.status += `${record.name}\n${record.year}\n${record.office}\nFiling Type: ${record.filing}`
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
                 if (e) {
