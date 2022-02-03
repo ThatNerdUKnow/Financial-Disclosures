@@ -20,6 +20,6 @@ jobs:
     - name: Docker Login
       run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag fd:$(date +%s)
+      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_USER}}/fd:$(date +%s)
     - name: Push to Docker Hub
       run: docker push ${{secrets.DOCKER_USER}}/fd
