@@ -3,5 +3,6 @@ WORKDIR /config
 COPY . .
 RUN npm i --only=production
 FROM ubuntu
-RUN apt-get install nodejs imagemagick ghostscript
+RUN apt-get install imagemagick ghostscript
+FROM node
 ENTRYPOINT node index.js
