@@ -15,4 +15,6 @@ RUN apt-get update \
 # Insall other deps
 RUN apt-get update && apt-get install -y imagemagick ghostscript
 RUN npm ci
-CMD ["node","index.js"]
+RUN adduser fd
+CMD ["su","fd","-c", "'node index.js'"]
+#CMD ["node","index.js"]
