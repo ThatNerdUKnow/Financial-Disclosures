@@ -81,7 +81,8 @@ async function preflight() {
     console.log("Launching Browser")
     const browser = await puppeteer.launch({
         defaultViewport: { width: 1920, height: 1080 },
-        headless: true
+        headless: true,
+        args:['no-sandbox']
     });
 
     console.log("Getting Page Context")
