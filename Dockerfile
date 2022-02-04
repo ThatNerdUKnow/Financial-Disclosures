@@ -13,6 +13,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
     
 # Insall other deps
-RUN apt-get install -y imagemagick ghostscript
+RUN apt-get update && apt-get install -y imagemagick ghostscript
 RUN npm ci
 CMD ["node","index.js"]
