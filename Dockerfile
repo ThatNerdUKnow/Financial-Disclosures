@@ -1,8 +1,6 @@
 FROM ubuntu
 WORKDIR /usr/src/app
 COPY . .
-RUN mkdir ./config/pdf
-RUN mkdir ./config/img
 
 RUN apt-get update
 RUN apt-get install -y curl
