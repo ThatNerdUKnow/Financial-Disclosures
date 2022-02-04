@@ -1,6 +1,4 @@
-import puppeteer from 'puppeteer';
 import { paginateAndScrape } from './scraper.js'
-import { SEARCH_LINK_SELECTOR, SEARCH_TABLE_SELECTOR, SUBMIT_BUTTON_SELECTOR } from './globals.js'
 import { promises as fs } from 'fs'
 import _ from 'lodash'
 import {downloadAndProcessPDF} from './pdf.js'
