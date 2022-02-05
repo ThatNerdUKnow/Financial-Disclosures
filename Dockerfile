@@ -2,6 +2,9 @@ FROM node:16
 WORKDIR /usr/src/app
 COPY . .
 
+# Set imagemagick's cache directory to our mount point so that we don't bloat our docker storage
+ENV MAGICK_TMPDIR /usr/src/app/config/cache
+
 # Do stuff that puppeteer requires for some reason
 RUN apt-get update \
   && apt-get install -y wget gnupg \
@@ -15,9 +18,14 @@ RUN apt-get update \
 # Insall other deps
 RUN apt-get update && apt-get install -y imagemagick ghostscript
 
-# Edit ImageMagick PDF Policy
+# Edit ImageMagick PDF Policy for read/write access
 RUN sed -i_bak \
 's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
+/etc/ImageMagick-6/policy.xml
+
+# Edit ImageMagick policy for a bigger disk cache
+RUN sed -i \
+'s/domain="resource" name="area" value="1GiB"/ domain="resource" name="area" value="30GiB"/' \
 /etc/ImageMagick-6/policy.xml
 
 # Install nodejs dependencies
