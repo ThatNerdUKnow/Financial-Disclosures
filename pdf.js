@@ -5,7 +5,7 @@ import _ from 'lodash'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid'
 
-async function processPDF(pdfPath) {
+export async function processPDF(pdfPath) {
     let basename = path.basename(pdfPath, '.pdf')
     let outputPath = "./config/img/" + basename + ".jpg";
 
@@ -14,7 +14,6 @@ async function processPDF(pdfPath) {
 
     // Promisify the callback of im.convert()
     let images = await new Promise((resolve, reject) => {
-
         // Take PDF file and generate individual JPG files
         im.convert(["-density", 300, "-quality", 80, pdfPath, outputPath], async (err) => {
 
@@ -93,3 +92,5 @@ export async function downloadAndProcessPDF(record) {
 
     return pdfData
 }
+
+export default { downloadAndProcessPDF, processPDF }
