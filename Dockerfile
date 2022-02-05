@@ -12,19 +12,15 @@ RUN apt-get update \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
-#RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
-# && mkdir -p /home/pptruser/Downloads \
-#&& chown -R pptruser:pptruser /home/pptruser \
-#&& chown -R pptruser:pptruser .
-
 # Insall other deps
 RUN apt-get update && apt-get install -y imagemagick ghostscript
 
 # Edit ImageMagick PDF Policy
-RUN sudo sed -i_bak \
+RUN sed -i_bak \
 's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
 /etc/ImageMagick-6/policy.xml
 
+# Install nodejs dependencies
 RUN npm ci
 
 # Run app as node
