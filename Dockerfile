@@ -19,6 +19,12 @@ RUN apt-get update \
 
 # Insall other deps
 RUN apt-get update && apt-get install -y imagemagick ghostscript
+
+# Edit ImageMagick PDF Policy
+RUN sudo sed -i_bak \
+'s/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
+/etc/ImageMagick-6/policy.xml
+
 RUN npm ci
 
 # Run app as node
