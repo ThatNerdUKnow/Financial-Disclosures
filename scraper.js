@@ -82,7 +82,7 @@ async function preflight() {
     const browser = await puppeteer.launch({
         defaultViewport: { width: 1920, height: 1080 },
         headless: true,
-        args:['no-sandbox']
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
 
     console.log("Getting Page Context")
