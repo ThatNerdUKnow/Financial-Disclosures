@@ -71,4 +71,4 @@ async function getFinancialDisclosures() {
 }
 
 getFinancialDisclosures()
-setInterval(getFinancialDisclosures,3600000)
+setInterval(getFinancialDisclosures,900000)
