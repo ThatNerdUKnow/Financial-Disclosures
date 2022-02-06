@@ -50,10 +50,10 @@ async function getFinancialDisclosures() {
     })
 
     
-    // Get number of cpu cores on host
-    const CORES = os.cpus().length
+    // Set max number of simultaneous calls to downloadAndProcessPDF
+    const CORES = process.env.THREAD_COUNT || os.cpus().length
 
-    // Split newRecords into chunks of size (how many cores the system has)
+    // Split newRecords into chunks
     let recordChunks = _.chunk(Object.values(newRecords),CORES)
 
     await recordChunks.reduce(async(memo,chunk)=>{
