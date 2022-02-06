@@ -25,7 +25,7 @@ RUN sed -i_bak \
 
 # Edit ImageMagick policy for a bigger disk cache
 RUN sed -i \
-'s/domain="resource" name="area" value="1GiB"/ domain="resource" name="area" value="30GiB"/' \
+'s/domain="resource" name="area" value="1GiB"/ domain="resource" name="area" value="50GiB"/' \
 /etc/ImageMagick-6/policy.xml
 
 # Install nodejs dependencies
