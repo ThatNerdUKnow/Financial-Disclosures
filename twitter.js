@@ -2,6 +2,7 @@ import 'dotenv/config'
 import Twitter from 'twitter'
 import { promises as fs } from 'fs'
 import _ from 'lodash'
+import path from 'path'
 
 
 const client = new Twitter({
@@ -30,8 +31,6 @@ export async function sendTweet(record) {
         if (isMultiPart) {
             status.status = `[${i + 1}/${media_chunks.length}]\n`
         }
-
-        //status.status += "Nothing to see here"
 
         status.status += `${record.name}\n${record.year}\n${record.office}\nFiling Type: ${record.filing}`
         return new Promise((resolve, reject) => {
@@ -69,7 +68,29 @@ export async function uploadPhotos(images) {
 
 export async function postDisclosure(record) {
     console.log(record)
-    let buffers = record.pdfRecord.images;
+    //let buffers = record.pdfRecord.images;
+    let buffers = await readImageBuffers(record.pdfRecord.files)
     record.media_ids = await uploadPhotos(buffers)
     return await sendTweet(record)
+}
+
+async function readImageBuffers(paths)
+{
+    
+    // For each file, read and return the buffer data along with the path
+    let images = await Promise.all(paths.map(async file => {
+        console.log(`Reading ${file} buffer data`)
+        const contents = await fs.readFile(file)
+        return { path: file, buffer: contents }
+    }))
+
+    // Since we read the files asynchonously, Reorder the files
+    images = _.orderBy(images, (image) => {
+        let regex = /\d*.jpg/
+        let res = image.path.match(regex)[0]
+        res = path.basename(res, '.jpg')
+        return res
+    })
+
+    return images
 }

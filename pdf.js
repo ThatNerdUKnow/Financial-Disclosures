@@ -38,9 +38,9 @@ async function processPDF(pdfPath) {
                     return file.includes(basename)
                 })
 
-                console.log(`Getting ${basename} Buffer Data`)
+                //console.log(`Getting ${basename} Buffer Data`)
 
-                // For each file, read and return the buffer data along with the path
+                /*// For each file, read and return the buffer data along with the path
                 let images = await Promise.all(files.map(async file => {
                     const contents = await fs.readFile(file)
                     return { path: file, buffer: contents }
@@ -52,9 +52,9 @@ async function processPDF(pdfPath) {
                     let res = image.path.match(regex)[0]
                     res = path.basename(res, '.jpg')
                     return res
-                })
+                })*/
 
-                let output = { pdf: pdfPath, images }
+                let output = { pdf: pdfPath, files }
 
                 resolve(output)
             }
