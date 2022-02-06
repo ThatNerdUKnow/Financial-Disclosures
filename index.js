@@ -60,14 +60,15 @@ async function getFinancialDisclosures() {
         await memo
         await Promise.all(chunk.map(async record=>{
             newRecords[record.disclosureURL].pdfRecord = await downloadAndProcessPDF(record)
+            postDisclosure(newRecords[record.disclosureURL])
         }))
     },undefined)
 
-   
-    // Post to Twitter*/
+   /*
+    // Post to Twitter
     Object.values(newRecords).forEach(record=>{
         postDisclosure(record)
-    })
+    })*/
 }
 
 getFinancialDisclosures()
