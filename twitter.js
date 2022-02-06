@@ -74,8 +74,8 @@ export async function postDisclosure(record) {
 
     let buffers = await readImageBuffers(record.pdfRecord.files)
     cleanupSideEffects(paths)
-    record.media_ids = await uploadPhotos(buffers)
-    let tweet = await sendTweet(record)
+    record.media_ids = await uploadPhotos(buffers).catch(e => { console.warn(e) })
+    let tweet = await sendTweet(record).catch(e => { console.warn(e) })
     record = null
     return tweet;
 }
