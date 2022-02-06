@@ -24,7 +24,7 @@ export async function sendTweet(record) {
     // Wait for all tweets
     console.log(`Posting to Twitter`)
     await Promise.all(media_chunks.map(async (media_ids, i) => {
-        let status = {status: ""}
+        let status = { status: "" }
         status.media_ids = media_ids.toString()
         let isMultiPart = (media_chunks.length > 1) ? true : false
 
@@ -69,14 +69,17 @@ export async function uploadPhotos(images) {
 export async function postDisclosure(record) {
     console.log(record)
     //let buffers = record.pdfRecord.images;
+    let paths = record.pdfRecord.files.map(x => { return x })
+    paths.push(record.pdfRecord.pdf)
+
     let buffers = await readImageBuffers(record.pdfRecord.files)
+    cleanupSideEffects(paths)
     record.media_ids = await uploadPhotos(buffers)
     return await sendTweet(record)
 }
 
-async function readImageBuffers(paths)
-{
-    
+async function readImageBuffers(paths) {
+
     // For each file, read and return the buffer data along with the path
     let images = await Promise.all(paths.map(async file => {
         console.log(`Reading ${file} buffer data`)
@@ -93,4 +96,11 @@ async function readImageBuffers(paths)
     })
 
     return images
+}
+
+async function cleanupSideEffects(paths) {
+    paths.forEach(path => {
+        console.log(`Deleting ${path}`)
+        fs.rm(path)
+    })
 }
