@@ -25,7 +25,17 @@ RUN sed -i_bak \
 
 # Edit ImageMagick policy for a bigger disk cache
 RUN sed -i \
-'s/domain="resource" name="disk" value="1GiB"/ domain="resource" name="disk" value="100GiB"/' \
+'s/domain="resource" name="disk" value="1GiB"/ domain="resource" name="disk" value="10GiB"/' \
+/etc/ImageMagick-6/policy.xml
+
+# Limit each instance's thread count to 1
+RUN sed -i \
+'s/domain="resource" name="thread" value="2"/ domain="resource" name="thread" value="1"/' \
+/etc/ImageMagick-6/policy.xml
+
+# Give imagemagick more memory
+RUN sed -i \
+'s/domain="resource" name="memory" value="256MiB"/ domain="resource" name="memory" value="2GiB"/' \
 /etc/ImageMagick-6/policy.xml
 
 # Install nodejs dependencies
