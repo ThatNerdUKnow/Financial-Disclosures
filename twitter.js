@@ -32,7 +32,7 @@ export async function sendTweet(record) {
             status.status = `[${i + 1}/${media_chunks.length}]\n`
         }
 
-        status.status += `${record.name}\n${record.year}\n${record.office}\nFiling Type: ${record.filing}`
+        status.status += `${record.name}\n#${record.year}\nOffice: ${record.office}\nFiling Type: ${record.filing}\n#usa #congress #financialdisclosure`
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
                 if (e) {
