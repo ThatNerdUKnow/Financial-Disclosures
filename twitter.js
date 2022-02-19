@@ -3,7 +3,7 @@ import Twitter from 'twitter'
 import { promises as fs } from 'fs'
 import _ from 'lodash'
 import path from 'path'
-
+import states from './states.js'
 
 const client = new Twitter({
     consumer_key: process.env.CONSUMER_KEY,
@@ -32,6 +32,9 @@ export async function sendTweet(record) {
             status.status = `[${i + 1}/${media_chunks.length}]\n`
         }
 
+        let state = getStateFromCode(record.office);
+        console.log(state)
+        
         status.status += `${record.name}\n${record.year}\n${record.office}\nFiling Type: ${record.filing}`
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
@@ -105,4 +108,10 @@ async function cleanupSideEffects(paths) {
         console.log(`Deleting ${path}`)
         fs.rm(path)
     })
+}
+
+function getStateFromCode(office)
+{
+    let stateCode = office.slice(0,2);
+    return states[stateCode];
 }
