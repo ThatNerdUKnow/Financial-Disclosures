@@ -33,14 +33,13 @@ export async function sendTweet(record) {
         }
 
         let state = getStateFromCode(record.office);
-        console.log(state)
 
         status.status += `
         ${record.name}\n
         ${record.year}\n
         Office: #${record.office}\n
         Filing Type: ${record.filing}\n
-        ${state ? state : ""} #usa #congress #financialdisclosure`;
+        ${state ? "#" + state : ""} #usa #congress #financialdisclosure`;
 
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
