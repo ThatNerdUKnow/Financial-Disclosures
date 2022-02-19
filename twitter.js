@@ -35,7 +35,7 @@ export async function sendTweet(record) {
         let state = getStateFromCode(record.office);
         console.log(state)
         
-        status.status += `${record.name}\n${record.year}\n${record.office}\nFiling Type: ${record.filing}`
+        status.status += `${record.name}\n#${record.year}\nOffice: ${record.office}\nFiling Type: ${record.filing}\n#usa #congress #financialdisclosure`
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
                 if (e) {
@@ -109,9 +109,12 @@ async function cleanupSideEffects(paths) {
         fs.rm(path)
     })
 }
+<<<<<<< HEAD
 
 function getStateFromCode(office)
 {
     let stateCode = office.slice(0,2);
     return states[stateCode];
 }
+=======
+>>>>>>> b833edd121d9c64bae06167da087d692978b49d3
