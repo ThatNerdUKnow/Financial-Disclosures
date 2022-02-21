@@ -35,10 +35,10 @@ export async function sendTweet(record) {
         let state = getStateFromCode(record.office);
 
         status.status += `
-        ${record.name}\n
-        ${record.year}\n
-        Office: #${record.office}\n
-        Filing Type: ${record.filing}\n
+        ${record.name}
+        ${record.year}
+        Office: #${record.office}
+        Filing Type: ${record.filing}
         ${state ? "#" + state : ""} #usa #congress #financialdisclosure`;
 
         return new Promise((resolve, reject) => {
