@@ -39,7 +39,8 @@ export async function sendTweet(record) {
         ${record.year}
         Office: #${record.office}
         Filing Type: ${record.filing}
-        ${state ? "#" + state : ""} #usa #congress #financialdisclosure`;
+        ${state ? "#" + state : ""}
+        #usa #congress #financialdisclosure`;
 
         return new Promise((resolve, reject) => {
             client.post('statuses/update', status, (e, data) => {
