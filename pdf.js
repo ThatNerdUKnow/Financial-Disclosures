@@ -37,22 +37,6 @@ export async function processPDF(pdfPath) {
                     return file.includes(basename)
                 })
 
-                //console.log(`Getting ${basename} Buffer Data`)
-
-                /*// For each file, read and return the buffer data along with the path
-                let images = await Promise.all(files.map(async file => {
-                    const contents = await fs.readFile(file)
-                    return { path: file, buffer: contents }
-                }))
-
-                // Since we read the files asynchonously, Reorder the files
-                images = _.orderBy(images, (image) => {
-                    let regex = /\d*.jpg/
-                    let res = image.path.match(regex)[0]
-                    res = path.basename(res, '.jpg')
-                    return res
-                })*/
-
                 let output = { pdf: pdfPath, files }
 
                 resolve(output)

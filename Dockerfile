@@ -5,6 +5,12 @@ COPY . .
 # Set imagemagick's cache directory to our mount point so that we don't bloat our docker storage
 ENV MAGICK_TMPDIR /usr/src/app/config/cache
 
+RUN mkdir config
+
+RUN mkdir config/img
+
+RUN mkdir config/pdf
+
 # Do stuff that puppeteer requires for some reason
 RUN apt-get update \
   && apt-get install -y wget gnupg \
