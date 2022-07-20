@@ -15,7 +15,7 @@ export async function processPDF(pdfPath) {
     // Promisify the callback of im.convert()
     let images = await new Promise((resolve, reject) => {
         // Take PDF file and generate individual JPG files
-        im.convert(["-density", 300, "-quality", 80, pdfPath, outputPath], async (err) => {
+        im.convert(["-alpha","remove","-density", 300, "-quality", 80, pdfPath, outputPath], async (err) => {
 
             if (err) {
                 console.log(err)
