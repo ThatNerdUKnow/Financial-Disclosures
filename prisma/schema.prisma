@@ -6,6 +6,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+model Representative {
+  id    Int     @default(autoincrement()) @id
+  url String  @unique // URL of disclosure report
+  name  String // Name of representative
+  office String // Office held by representative
+  date DateTime // Date of submission
+  type String // Financial Disclosure type
+  body String // Senate or House
 }

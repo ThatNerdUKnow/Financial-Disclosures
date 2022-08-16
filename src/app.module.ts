@@ -2,14 +2,20 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TwitterModule } from './twitter/twitter.module';
-import { HouseModule } from './disclosures/house/house.module';
-import { SenateModule } from './disclosures/senate/senate.module';
 import { ImagemagickModule } from './imagemagick/imagemagick.module';
-import { House.Service.TsService } from './disclosures/house.service.ts/house.service.ts.service';
+import { DisclosuresModule } from './disclosures/disclosures.module';
+import { DatabaseModule } from './database/database.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TwitterModule, HouseModule, SenateModule, ImagemagickModule],
+  imports: [
+    TwitterModule,
+    ImagemagickModule,
+    DisclosuresModule,
+    DatabaseModule,
+    ConfigModule.forRoot(),
+  ],
   controllers: [AppController],
-  providers: [AppService, House.Service.TsService],
+  providers: [AppService],
 })
 export class AppModule {}
