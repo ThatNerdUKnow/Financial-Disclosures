@@ -32,9 +32,9 @@ export class HouseService {
         const data = await this.prisma.report.create({
           data: record,
         });
-        console.debug(`Recorded report ${data}`);
+        console.debug(`Recorded report ${record.url}`);
       } catch (e) {
-        this.logger.warn(e);
+        this.logger.warn(e.message);
       }
     });
   }
@@ -97,7 +97,7 @@ export class HouseService {
       console.error(e);
     }
   }
-
+  0;
   async getEveryRecordOnPage(): Promise<Array<Report>> {
     const recordsOnPage = await this.page.evaluate((SEARCH_TABLE_SELECTOR) => {
       const records: Array<Report> = [];
@@ -117,10 +117,9 @@ export class HouseService {
         records.push({
           name,
           office,
-          date: new Date(year),
+          date: year,
           type,
           url,
-          id: 0,
           body: 'House',
         });
       });

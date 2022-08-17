@@ -11,11 +11,10 @@ datasource db {
 }
 
 model Report {
-  id    Int     @default(autoincrement()) @id
-  url String  @unique // URL of disclosure report
+  url String @id @unique // URL of disclosure report
   name  String // Name of representative
   office String // Office held by representative
-  date DateTime // Date of submission
+  date String // Date of submission
   type String // Financial Disclosure type
   body String // Senate or House
 }
