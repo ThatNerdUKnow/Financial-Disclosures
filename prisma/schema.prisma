@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Representative {
+model Report {
   id    Int     @default(autoincrement()) @id
   url String  @unique // URL of disclosure report
   name  String // Name of representative
