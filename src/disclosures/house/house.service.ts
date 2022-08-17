@@ -4,7 +4,7 @@ import { Page } from 'puppeteer';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { ScraperService } from '../scraper/scraper.service';
 import { Report } from '@prisma/client';
-import { BullQueueEvent, InjectQueue } from '@nestjs/bull';
+import { BullQueueEvent, InjectQueue, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 
 @Injectable()
@@ -31,8 +31,8 @@ export class HouseService {
     await this.init();
     const records: Array<Report> = await this.paginateAndScrape();
     this.logger.log('Queueing Records for Processing');
-    records.map(async (record) => {
-      this.reportQueue
+    const jobs = records.map(async (record) => {
+      return this.reportQueue
         .add(record, { jobId: record.url })
         .then((job: Job) => {
           this.logger.verbose(`Successfully queued ${job.opts.jobId}`);
@@ -41,6 +41,8 @@ export class HouseService {
           this.logger.error(e);
         });
     });
+    await Promise.all(jobs);
+    this.logger.log('Queued All House reports for Processing');
   }
 
   async init() {
@@ -86,6 +88,7 @@ export class HouseService {
       currentPage += 1;
     }
     this.page.close();
+    this.logger.log('Finished Scraping House Disclosures');
     return records;
   }
 
@@ -101,7 +104,7 @@ export class HouseService {
       console.error(e);
     }
   }
-  0;
+
   async getEveryRecordOnPage(): Promise<Array<Report>> {
     const recordsOnPage = await this.page.evaluate((SEARCH_TABLE_SELECTOR) => {
       const records: Array<Report> = [];
