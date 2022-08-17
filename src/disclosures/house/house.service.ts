@@ -4,6 +4,8 @@ import { Page } from 'puppeteer';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { ScraperService } from '../scraper/scraper.service';
 import { Report } from '@prisma/client';
+import { BullQueueEvent, InjectQueue } from '@nestjs/bull';
+import { Job, Queue } from 'bull';
 
 @Injectable()
 export class HouseService {
@@ -16,26 +18,28 @@ export class HouseService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly scraper: ScraperService,
+    @InjectQueue('report') private readonly reportQueue: Queue,
   ) {}
 
   async onApplicationBootstrap() {
     this.getReports();
   }
 
-  @Cron('0 * * * * *')
+  @Cron('0 * * * *')
   async getReports() {
     this.logger.log('Retrieving House Disclosures');
     await this.init();
-    const records = await this.paginateAndScrape();
-    records.forEach(async (record) => {
-      try {
-        const data = await this.prisma.report.create({
-          data: record,
+    const records: Array<Report> = await this.paginateAndScrape();
+    this.logger.log('Queueing Records for Processing');
+    records.map(async (record) => {
+      this.reportQueue
+        .add(record, { jobId: record.url })
+        .then((job: Job) => {
+          this.logger.verbose(`Successfully queued ${job.opts.jobId}`);
+        })
+        .catch((e) => {
+          this.logger.error(e);
         });
-        console.debug(`Recorded report ${record.url}`);
-      } catch (e) {
-        this.logger.warn(e.message);
-      }
     });
   }
 
