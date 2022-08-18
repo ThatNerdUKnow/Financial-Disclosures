@@ -20,6 +20,10 @@ import { ScheduleModule } from '@nestjs/schedule';
         host: process.env.REDIS_URL,
         port: 6379,
       },
+      defaultJobOptions: {
+        attempts: 10,
+        backoff: { type: 'exponential', delay: 60000 },
+      },
     }),
   ],
   controllers: [],

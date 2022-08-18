@@ -4,9 +4,14 @@ import { HouseService } from './house/house.service';
 import { SenateService } from './senate/senate.service';
 import { ScraperService } from './scraper/scraper.service';
 import { BullModule } from '@nestjs/bull';
+import { ProcessorService } from './processor/processor.service';
 
 @Module({
-  providers: [HouseService, SenateService, ScraperService],
-  imports: [DatabaseModule, BullModule.registerQueue({ name: 'report' })],
+  providers: [HouseService, SenateService, ScraperService, ProcessorService],
+  imports: [
+    DatabaseModule,
+    BullModule.registerQueue({ name: 'report' }),
+    BullModule.registerQueue({ name: 'pdf' }),
+  ],
 })
 export class DisclosuresModule {}

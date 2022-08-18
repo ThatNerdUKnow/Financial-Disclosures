@@ -1,10 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Page } from 'puppeteer';
-import { PrismaService } from 'src/database/prisma/prisma.service';
 import { ScraperService } from '../scraper/scraper.service';
 import { Report } from '@prisma/client';
-import { BullQueueEvent, InjectQueue, Processor } from '@nestjs/bull';
+import { InjectQueue } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 
 @Injectable()
@@ -16,7 +15,6 @@ export class HouseService {
 
   private readonly logger = new Logger(HouseService.name);
   constructor(
-    private readonly prisma: PrismaService,
     private readonly scraper: ScraperService,
     @InjectQueue('report') private readonly reportQueue: Queue,
   ) {}
@@ -33,16 +31,18 @@ export class HouseService {
     this.logger.log('Queueing Records for Processing');
     const jobs = records.map(async (record) => {
       return this.reportQueue
-        .add(record, { jobId: record.url })
+        .add(record, {
+          jobId: record.url,
+        })
         .then((job: Job) => {
-          this.logger.verbose(`Successfully queued ${job.opts.jobId}`);
+          this.logger.verbose(`Queued ${job.opts.jobId}`);
         })
         .catch((e) => {
           this.logger.error(e);
         });
     });
     await Promise.all(jobs);
-    this.logger.log('Queued All House reports for Processing');
+    this.logger.log(`Queued ${jobs.length} reports for Processing`);
   }
 
   async init() {
