@@ -16,7 +16,7 @@ export class HouseService {
   private readonly logger = new Logger(HouseService.name);
   constructor(
     private readonly scraper: ScraperService,
-    @InjectQueue('report') private readonly reportQueue: Queue,
+    @InjectQueue('download') private readonly reportQueue: Queue,
   ) {}
 
   async onApplicationBootstrap() {

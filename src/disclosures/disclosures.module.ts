@@ -4,13 +4,13 @@ import { HouseService } from './house/house.service';
 import { SenateService } from './senate/senate.service';
 import { ScraperService } from './scraper/scraper.service';
 import { BullModule } from '@nestjs/bull';
-import { ProcessorService } from './processor/processor.service';
+import { DownloadService } from './download/download.service';
 
 @Module({
-  providers: [HouseService, SenateService, ScraperService, ProcessorService],
+  providers: [HouseService, SenateService, ScraperService, DownloadService],
   imports: [
     DatabaseModule,
-    BullModule.registerQueue({ name: 'report' }),
+    BullModule.registerQueue({ name: 'download' }),
     BullModule.registerQueue({ name: 'pdf' }),
   ],
 })
