@@ -1,7 +1,9 @@
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ImagemagickService } from './imagemagick.service';
 
 @Module({
-  providers: [ImagemagickService]
+  providers: [ImagemagickService],
+  imports: [BullModule.registerQueue({ name: 'pdf' })],
 })
 export class ImagemagickModule {}

@@ -39,16 +39,18 @@ export class DownloadService {
           this.logger.error(`Couldn't download ${job.data.url}`, e);
         })) as AxiosResponse;
 
-      const id =
-        'src/../config/pdf/' +
-        Buffer.from(job.data.url).toString('base64') +
-        '.pdf';
+      const basename = Buffer.from(job.data.url).toString('base64');
+      const id = 'src/../config/pdf/' + basename + '.pdf';
       this.logger.verbose(`Writing ${id} to filesystem`);
 
       await fs.writeFile(id, data);
       this.logger.verbose(`Queueing pdf Job`);
 
-      const pdfJob: pdfJob = { report: job.data, pdfPath: id };
+      const pdfJob: pdfJob = {
+        report: job.data,
+        pdfPath: id,
+        baseName: basename,
+      };
       this.pdfQueue
         .add(pdfJob, { jobId: job.data.url })
         .then((job: Job) => {
@@ -63,6 +65,6 @@ export class DownloadService {
 
   @OnQueueDrained()
   reportQueueComplete() {
-    this.logger.debug('All Reports Have been Downloaded');
+    this.logger.log('All Reports Have been Downloaded');
   }
 }
