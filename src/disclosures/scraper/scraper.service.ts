@@ -13,10 +13,14 @@ export class ScraperService {
   }
 
   async onModuleDestroy() {
-    console.log('Closing Broser');
+    console.log('Closing Browser');
     await this.browser.close();
   }
 
   private readonly logger = new Logger(ScraperService.name);
+
+  /**
+   * @Description Singleton access to a web browser instance
+   */
   public browser: Browser;
 }

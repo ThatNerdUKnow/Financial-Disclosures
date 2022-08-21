@@ -12,6 +12,9 @@ export class ImagemagickService {
 
   private readonly logger = new Logger(ImagemagickService.name);
 
+  /**
+   * @Description Converts downloaded pdf into individual jpeg files
+   */
   @Process()
   async processPDF(job: Job<pdfJob>) {
     const IMAGE_DIR = `src/../config/img/`;

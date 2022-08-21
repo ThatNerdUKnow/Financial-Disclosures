@@ -17,6 +17,11 @@ export class DownloadService {
 
   private readonly logger = new Logger(DownloadService.name);
 
+  /**
+   *
+   * @description Downloads PDF Files from disclosure reports and then queues them for conversion to jpg files
+   * @returns
+   */
   @Process()
   async process(job: Job<Report>) {
     this.logger.debug(`Downloading ${job.data.url}`);

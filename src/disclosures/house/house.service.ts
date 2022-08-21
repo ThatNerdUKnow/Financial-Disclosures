@@ -23,6 +23,11 @@ export class HouseService {
     this.getReports();
   }
 
+  /**
+   * @Description Scrapes the public financial disclosures at clerk.house.gov 
+   * and queues them for downloading/further processing
+   * This is the entry point of the scraper
+   */
   @Cron('0 * * * *')
   async getReports() {
     this.logger.log('Retrieving House Disclosures');
@@ -45,6 +50,9 @@ export class HouseService {
     this.logger.log(`Queued ${jobs.length} reports for Processing`);
   }
 
+  /**
+   * @Description Initializes page context for scraping
+   */
   async init() {
     this.logger.log('Getting page context');
     this.page = await this.scraper.browser.newPage();
@@ -70,7 +78,11 @@ export class HouseService {
     this.logger.debug('Disclosure list populated');
   }
 
-  async paginateAndScrape() {
+  /**
+   * @Description Combines every record on all pages into a single array
+   * @returns An array of every disclosure on the site
+   */
+  async paginateAndScrape(): Promise<Array<Report>> {
     this.logger.log('Scraping House Disclosures');
 
     await this.page.waitForSelector(this.PAGINATOR_SELECTOR);
@@ -92,6 +104,11 @@ export class HouseService {
     return records;
   }
 
+  /**
+   * @Description We need to work around pagination on the reporting site
+   * This function gets us the number of pages available so we know when to stop
+   * @returns a number representing how many pages we need to scrape
+   */
   async getLastPage(): Promise<number> {
     const lastSelector = this.PAGINATOR_SELECTOR + ' span a';
     const last = await this.page.evaluate((selector) => {
@@ -105,6 +122,11 @@ export class HouseService {
     }
   }
 
+  /**
+   * @Description Only a handful of records show up per page, this function downloads
+   * every record on the current page
+   * @returns An array containing every report on the current page
+   */
   async getEveryRecordOnPage(): Promise<Array<Report>> {
     const recordsOnPage = await this.page.evaluate((SEARCH_TABLE_SELECTOR) => {
       const records: Array<Report> = [];
@@ -135,6 +157,11 @@ export class HouseService {
     return recordsOnPage;
   }
 
+  /**
+   * @Description Only a handful of reports show up per page
+   * This function is called to advance to the next page so that
+   * scraping can continue
+   */
   async advancePage(): Promise<void> {
     const nextSelector = this.PAGINATOR_SELECTOR + ' a.next';
 
