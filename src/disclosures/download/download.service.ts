@@ -27,6 +27,7 @@ export class DownloadService {
 
     if (!found) {
       this.logger.verbose(`${job.id} does not already exist`);
+
       const { data } = (await axios
         .get<any>(job.data.url, {
           responseType: 'arraybuffer',
@@ -41,16 +42,18 @@ export class DownloadService {
 
       const basename = Buffer.from(job.data.url).toString('base64');
       const id = 'src/../config/pdf/' + basename + '.pdf';
+
       this.logger.verbose(`Writing ${id} to filesystem`);
 
       await fs.writeFile(id, data);
-      this.logger.verbose(`Queueing pdf Job`);
 
+      this.logger.verbose(`Queueing pdf Job`);
       const pdfJob: pdfJob = {
         report: job.data,
         pdfPath: id,
         baseName: basename,
       };
+
       this.pdfQueue
         .add(pdfJob, { jobId: job.data.url })
         .then((job: Job) => {
