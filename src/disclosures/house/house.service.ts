@@ -16,7 +16,7 @@ export class HouseService {
   private readonly logger = new Logger(HouseService.name);
   constructor(
     private readonly scraper: ScraperService,
-    @InjectQueue('download') private readonly reportQueue: Queue,
+    @InjectQueue('download') private readonly reportQueue: Queue<Report>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -24,7 +24,7 @@ export class HouseService {
   }
 
   /**
-   * @Description Scrapes the public financial disclosures at clerk.house.gov 
+   * @Description Scrapes the public financial disclosures at clerk.house.gov
    * and queues them for downloading/further processing
    * This is the entry point of the scraper
    */
@@ -34,7 +34,7 @@ export class HouseService {
     await this.init();
     const records: Array<Report> = await this.paginateAndScrape();
     this.logger.log('Queueing Records for Processing');
-    const jobs = records.map(async (record) => {
+    const jobs = records.slice(0, 1).map(async (record) => {
       return this.reportQueue
         .add(record, {
           jobId: record.url,

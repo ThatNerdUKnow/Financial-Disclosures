@@ -4,6 +4,9 @@ import { ImagemagickService } from './imagemagick.service';
 
 @Module({
   providers: [ImagemagickService],
-  imports: [BullModule.registerQueue({ name: 'pdf' })],
+  imports: [
+    BullModule.registerQueue({ name: 'pdf' }),
+    BullModule.registerQueue({ name: 'twitter' }),
+  ],
 })
 export class ImagemagickModule {}

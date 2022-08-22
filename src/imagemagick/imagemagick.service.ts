@@ -4,11 +4,14 @@ import { Job, Queue } from 'bull';
 import { pdfJob } from './pdfJob';
 import im from 'imagemagick';
 import { promises as fs } from 'fs';
+import { twitterJob } from 'src/twitter/twitterJob';
 
 @Injectable()
 @Processor('pdf')
 export class ImagemagickService {
-  constructor(@InjectQueue('pdf') private readonly pdfQueue: Queue) {}
+  constructor(
+    @InjectQueue('twitter') private readonly twitterQueue: Queue<twitterJob>,
+  ) {}
 
   private readonly logger = new Logger(ImagemagickService.name);
 
@@ -24,7 +27,7 @@ export class ImagemagickService {
     this.logger.debug(`Converting ${job.data.pdfPath}`);
 
     // Promisify the callback of im.convert()
-    await new Promise((resolve, reject) => {
+    const data = await new Promise<twitterJob>((resolve, reject) => {
       // Take PDF file and generate individual JPG files
       im.convert(
         [
@@ -56,7 +59,11 @@ export class ImagemagickService {
               return file.includes(baseName);
             });
 
-            const output = { pdf: pdfPath, files };
+            const output: twitterJob = {
+              report: job.data.report,
+              pdfPath: pdfPath,
+              images: files,
+            };
 
             resolve(output);
           }
@@ -65,6 +72,8 @@ export class ImagemagickService {
 
       //return images;
     });
+
+    this.twitterQueue.add(data);
   }
 
   @OnQueueDrained()

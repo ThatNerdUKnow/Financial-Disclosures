@@ -12,7 +12,7 @@ import { pdfJob } from 'src/imagemagick/pdfJob';
 export class DownloadService {
   constructor(
     private readonly db: PrismaService,
-    @InjectQueue('pdf') private readonly pdfQueue: Queue,
+    @InjectQueue('pdf') private readonly pdfQueue: Queue<pdfJob>,
   ) {}
 
   private readonly logger = new Logger(DownloadService.name);
