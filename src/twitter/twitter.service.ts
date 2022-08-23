@@ -1,8 +1,11 @@
-import { OnQueueDrained, Process, Processor } from '@nestjs/bull';
+import { OnQueueDrained, OnQueueError, Process, Processor } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
 import { Job } from 'bull';
 import { twitterJob } from './twitterJob';
 import Twitter from 'twitter';
+import _ from 'lodash';
+import { MediaResponse } from './mediaResponse';
+import { StateService } from './state/state.service';
 
 @Injectable()
 @Processor('twitter')
@@ -15,13 +18,92 @@ export class TwitterService {
     access_token_secret: process.env.ACCESS_TOKEN_SECRET,
   });
 
-  @Process()
-  async processTweet(job: Job<twitterJob>) {}
+  constructor(private readonly stateService: StateService) {}
 
-  async postDisclosure() {}
+  @Process()
+  async processTweet(job: Job<twitterJob>) {
+    this.logger.debug(`Processing job ${job.id}`);
+    const media_ids = await this.uploadPhotos(job.data);
+    const tweet = await this.sendTweet(job.data, media_ids);
+    return tweet;
+  }
+
+  async uploadPhotos(job: twitterJob): Promise<MediaResponse[]> {
+    const buffers: Promise<MediaResponse>[] = job.images.map(async (image) => {
+      return new Promise((resolve, reject) => {
+        this.twitterClient.post(
+          'media/upload',
+          { media: image.buffer },
+          (e, media) => {
+            if (e) {
+              this.logger.error(e);
+              reject(e);
+            } else if (media) {
+              resolve(media as MediaResponse);
+            }
+          },
+        );
+      });
+    });
+
+    try {
+      const mediaIds = await Promise.all(buffers);
+      this.logger.debug(`Successfully uploaded media`);
+      return mediaIds;
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
+  }
+
+  async sendTweet(job: twitterJob, mediaIds: MediaResponse[]) {
+    const media_chunks = _.chunk(
+      mediaIds.map((media) => media.media_id_string),
+    );
+
+    this.logger.verbose(`Posting to twitter`);
+    await Promise.all(
+      media_chunks.map(async (media_ids, i) => {
+        const status: any = { status: '' };
+        const { report } = job;
+        status.media_ids = media_ids.toString();
+        const isMultiPart = media_chunks.length > 1 ? true : false;
+
+        if (isMultiPart) {
+          status.status = `[${i + 1}/${media_chunks.length}]\n`;
+        }
+
+        const state = this.stateService.getStateFromCode(report.office);
+
+        status.status += `
+        ${report.body}
+        ${report.name}
+        ${report.date}
+        Office: #${report.office}
+        Filing Type: ${report.type}
+        ${state ? '#' + state : ''}
+        #usa #congress #financialdisclosure`;
+
+        return new Promise((resolve, reject) => {
+          this.twitterClient.post('statuses/update', status, (e, data) => {
+            if (e) {
+              reject(e);
+            } else if (data) {
+              resolve(data);
+            }
+          });
+        });
+      }),
+    );
+  }
 
   @OnQueueDrained()
   QueueComplete() {
-    this.logger.log('All Tweets have been sent');
+    this.logger.log('No More jobs to process');
+  }
+
+  @OnQueueError()
+  QueueError(e: Error) {
+    this.logger.error(e);
   }
 }

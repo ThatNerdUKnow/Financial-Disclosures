@@ -34,7 +34,7 @@ export class DownloadService {
       this.logger.verbose(`${job.id} does not already exist`);
 
       const { data } = (await axios
-        .get<any>(job.data.url, {
+        .get<Buffer>(job.data.url, {
           responseType: 'arraybuffer',
           headers: {
             'Content-Type': 'application/json',

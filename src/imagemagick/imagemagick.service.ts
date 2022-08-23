@@ -4,7 +4,9 @@ import { Job, Queue } from 'bull';
 import { pdfJob } from './pdfJob';
 import im from 'imagemagick';
 import { promises as fs } from 'fs';
-import { twitterJob } from 'src/twitter/twitterJob';
+import { twitterJob, Image } from 'src/twitter/twitterJob';
+import path from 'path';
+import _ from 'lodash';
 
 @Injectable()
 @Processor('pdf')
@@ -62,7 +64,7 @@ export class ImagemagickService {
             const output: twitterJob = {
               report: job.data.report,
               pdfPath: pdfPath,
-              images: files,
+              images: await this.readImageBuffers(files),
             };
 
             resolve(output);
@@ -72,8 +74,33 @@ export class ImagemagickService {
 
       //return images;
     });
+    this.logger.verbose(`Cleaning up side effects`);
+    data.images.map((path) => {
+      fs.rm(path.path);
+    });
 
-    this.twitterQueue.add(data);
+    this.twitterQueue.add(data, { removeOnComplete: true, removeOnFail: true });
+  }
+
+  async readImageBuffers(paths: string[]): Promise<Image[]> {
+    // For each file, read and return the buffer data along with the path
+    let images = await Promise.all(
+      paths.map(async (file) => {
+        this.logger.verbose(`Reading ${file} buffer data`);
+        const contents: Buffer = await fs.readFile(file);
+        return { path: file, buffer: contents };
+      }),
+    );
+
+    // Since we read the files asynchronously, Reorder the files
+    images = _.orderBy(images, (image) => {
+      const regex = /\d*.jpg/;
+      let res = image.path.match(regex)[0];
+      res = path.basename(res, '.jpg');
+      return res;
+    });
+
+    return images;
   }
 
   @OnQueueDrained()
