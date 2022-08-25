@@ -23,10 +23,6 @@ export class TwitterService {
   @Process()
   async processTweet(job: Job<twitterJob<BullBuffer>>) {
     this.logger.debug(`Processing job ${job.id}`);
-    console.log(job.data);
-    job.data.images.forEach((image) => {
-      console.log(image);
-    });
     const media_ids = await this.uploadPhotos(job.data);
     const tweet = await this.sendTweet(job.data, media_ids);
     return tweet;
@@ -64,6 +60,7 @@ export class TwitterService {
   async sendTweet(job: twitterJob<BullBuffer>, mediaIds: MediaResponse[]) {
     const media_chunks = _.chunk(
       mediaIds.map((media) => media.media_id_string),
+      4,
     );
 
     this.logger.verbose(`Posting to twitter`);
