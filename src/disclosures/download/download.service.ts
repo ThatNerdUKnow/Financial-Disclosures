@@ -18,7 +18,6 @@ export class DownloadService {
   private readonly logger = new Logger(DownloadService.name);
 
   /**
-   *
    * @description Downloads PDF Files from disclosure reports and then queues them for conversion to jpg files
    * @returns
    */
@@ -33,6 +32,7 @@ export class DownloadService {
     if (!found) {
       this.logger.verbose(`${job.id} does not already exist`);
 
+      // Get Buffer of PDF document
       const { data } = (await axios
         .get<Buffer>(job.data.url, {
           responseType: 'arraybuffer',
@@ -45,6 +45,7 @@ export class DownloadService {
           this.logger.error(`Couldn't download ${job.data.url}`, e);
         })) as AxiosResponse;
 
+      // Write PDF to filesystem. PDF Name is base64 encoded from the url, making the name deterministic
       const basename = Buffer.from(job.data.url).toString('base64');
       const id = 'src/../config/pdf/' + basename + '.pdf';
 
@@ -53,6 +54,8 @@ export class DownloadService {
       await fs.writeFile(id, data);
 
       this.logger.verbose(`Queueing pdf Job`);
+
+      // Generate Job data
       const pdfJob: pdfJob = {
         report: job.data,
         pdfPath: id,

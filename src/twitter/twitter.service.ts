@@ -1,7 +1,7 @@
 import { OnQueueDrained, OnQueueError, Process, Processor } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { twitterJob } from './twitterJob';
+import { BullBuffer, twitterJob } from './twitterJob';
 import Twitter from 'twitter';
 import _ from 'lodash';
 import { MediaResponse } from './mediaResponse';
@@ -21,19 +21,24 @@ export class TwitterService {
   constructor(private readonly stateService: StateService) {}
 
   @Process()
-  async processTweet(job: Job<twitterJob>) {
+  async processTweet(job: Job<twitterJob<BullBuffer>>) {
     this.logger.debug(`Processing job ${job.id}`);
+    console.log(job.data);
+    job.data.images.forEach((image) => {
+      console.log(image);
+    });
     const media_ids = await this.uploadPhotos(job.data);
     const tweet = await this.sendTweet(job.data, media_ids);
     return tweet;
   }
 
-  async uploadPhotos(job: twitterJob): Promise<MediaResponse[]> {
+  async uploadPhotos(job: twitterJob<BullBuffer>): Promise<MediaResponse[]> {
     const buffers: Promise<MediaResponse>[] = job.images.map(async (image) => {
+      const imageBuffer: Buffer = Buffer.from(image.buffer.data);
       return new Promise((resolve, reject) => {
         this.twitterClient.post(
           'media/upload',
-          { media: image.buffer },
+          { media: imageBuffer },
           (e, media) => {
             if (e) {
               this.logger.error(e);
@@ -51,12 +56,12 @@ export class TwitterService {
       this.logger.debug(`Successfully uploaded media`);
       return mediaIds;
     } catch (e) {
-      this.logger.error(e);
+      console.error(e);
       throw e;
     }
   }
 
-  async sendTweet(job: twitterJob, mediaIds: MediaResponse[]) {
+  async sendTweet(job: twitterJob<BullBuffer>, mediaIds: MediaResponse[]) {
     const media_chunks = _.chunk(
       mediaIds.map((media) => media.media_id_string),
     );
@@ -103,7 +108,7 @@ export class TwitterService {
   }
 
   @OnQueueError()
-  QueueError(e: Error) {
-    this.logger.error(e);
+  QueueError(job: Job, e: Error) {
+    this.logger.error(`Job ${job.id} failed with error ${e}`);
   }
 }

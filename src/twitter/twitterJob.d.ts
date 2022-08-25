@@ -1,12 +1,19 @@
 import { Report } from '@prisma/client';
 
-export type twitterJob = {
+export type TwitterJobType = Buffer | BullBuffer;
+
+export type twitterJob<TwitterJobType> = {
   report: Report;
   pdfPath: string;
-  images: Image[];
+  images: Image<TwitterJobType>[];
 };
 
-export type Image = {
+export type Image<TwitterJobType> = {
   path: string;
-  buffer: Buffer;
+  buffer: TwitterJobType;
+};
+
+export type BullBuffer = {
+  type: 'Buffer';
+  data: number[];
 };

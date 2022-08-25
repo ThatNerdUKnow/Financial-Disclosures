@@ -12,7 +12,8 @@ import _ from 'lodash';
 @Processor('pdf')
 export class ImagemagickService {
   constructor(
-    @InjectQueue('twitter') private readonly twitterQueue: Queue<twitterJob>,
+    @InjectQueue('twitter')
+    private readonly twitterQueue: Queue<twitterJob<Buffer>>,
   ) {}
 
   private readonly logger = new Logger(ImagemagickService.name);
@@ -29,7 +30,7 @@ export class ImagemagickService {
     this.logger.debug(`Converting ${job.data.pdfPath}`);
 
     // Promisify the callback of im.convert()
-    const data = await new Promise<twitterJob>((resolve, reject) => {
+    const data = await new Promise<twitterJob<Buffer>>((resolve, reject) => {
       // Take PDF file and generate individual JPG files
       im.convert(
         [
@@ -61,7 +62,7 @@ export class ImagemagickService {
               return file.includes(baseName);
             });
 
-            const output: twitterJob = {
+            const output: twitterJob<Buffer> = {
               report: job.data.report,
               pdfPath: pdfPath,
               images: await this.readImageBuffers(files),
@@ -79,10 +80,10 @@ export class ImagemagickService {
       fs.rm(path.path);
     });
 
-    this.twitterQueue.add(data, { removeOnComplete: true, removeOnFail: true });
+    this.twitterQueue.add(data, { removeOnComplete: true });
   }
 
-  async readImageBuffers(paths: string[]): Promise<Image[]> {
+  async readImageBuffers(paths: string[]): Promise<Image<Buffer>[]> {
     // For each file, read and return the buffer data along with the path
     let images = await Promise.all(
       paths.map(async (file) => {
