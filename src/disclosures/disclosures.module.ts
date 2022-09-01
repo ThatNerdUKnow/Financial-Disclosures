@@ -7,7 +7,7 @@ import { BullModule } from '@nestjs/bull';
 import { DownloadService } from './download/download.service';
 
 @Module({
-  providers: [HouseService, SenateService, ScraperService, DownloadService],
+  providers: [SenateService, ScraperService, DownloadService],
   imports: [
     DatabaseModule,
     BullModule.registerQueue({ name: 'download' }),

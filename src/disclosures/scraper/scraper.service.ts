@@ -7,7 +7,7 @@ export class ScraperService {
     this.logger.log('Starting Browser');
     this.browser = await puppeteer.launch({
       defaultViewport: { width: 1920, height: 1080 },
-      headless: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
   }
