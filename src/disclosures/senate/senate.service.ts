@@ -36,7 +36,7 @@ export class SenateService {
     } catch (e) {
       this.logger.error(e);
     }
-    //this.page.close();
+    this.page.close();
   }
 
   async init() {
@@ -54,7 +54,7 @@ export class SenateService {
     this.logger.verbose('Waiting for navigation');
 
     try {
-      await this.page.waitForNavigation();
+      await this.page.waitForNavigation({ timeout: 5000 });
     } catch (e) {
       this.logger.error(e);
       if (await this.page.$(this.SEARCH_BUTTON_SELECTOR)) {
@@ -134,7 +134,7 @@ export class SenateService {
 
   async advancePage() {
     await this.page.click(this.PAGINATE_NEXT_SELECTOR);
-    await this.delay(1000);
+    await this.page.waitForNetworkIdle({ idleTime: 200 });
   }
 
   public readonly delay = (ms: number) =>
