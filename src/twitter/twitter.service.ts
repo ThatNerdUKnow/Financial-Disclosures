@@ -22,10 +22,15 @@ export class TwitterService {
 
   @Process()
   async processTweet(job: Job<twitterJob<BullBuffer>>) {
-    this.logger.debug(`Processing job ${job.id}`);
-    const media_ids = await this.uploadPhotos(job.data);
-    const tweet = await this.sendTweet(job.data, media_ids);
-    return tweet;
+    if (process.env.ENABLE_TWITTER === 'true') {
+      this.logger.debug(`Processing job ${job.id}`);
+      const media_ids = await this.uploadPhotos(job.data);
+      const tweet = await this.sendTweet(job.data, media_ids);
+      return tweet;
+    } else {
+      this.logger.warn(`Twitter Disabled: Skipping job: ${job.id}`);
+      return 'Twitter Disabled';
+    }
   }
 
   async uploadPhotos(job: twitterJob<BullBuffer>): Promise<MediaResponse[]> {

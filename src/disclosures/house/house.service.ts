@@ -57,6 +57,8 @@ export class HouseService {
     this.logger.log('Getting page context');
     this.page = await this.scraper.browser.newPage();
 
+    this.page.setDefaultTimeout(0);
+
     this.logger.debug('Navigating to House Disclosure Site');
 
     await this.page.goto(process.env.HOUSE_URL, { waitUntil: 'networkidle2' });

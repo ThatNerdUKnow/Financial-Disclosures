@@ -23,7 +23,7 @@ export class SenateService {
   private page: Page;
 
   async onApplicationBootstrap() {
-    //this.getReports();
+    this.getReports();
   }
 
   @Cron(`0 * * * *`)
@@ -40,6 +40,8 @@ export class SenateService {
   async init() {
     this.logger.log('Getting page context');
     this.page = await this.scraperService.browser.newPage();
+
+    this.page.setDefaultTimeout(0);
 
     this.logger.debug('Navigating to senate disclosure site');
 
