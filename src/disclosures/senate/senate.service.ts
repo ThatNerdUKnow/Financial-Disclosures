@@ -3,9 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Report } from '@prisma/client';
 import { Queue } from 'bull';
-import { filter } from 'lodash';
 import { Page } from 'puppeteer';
-import { sleep } from 'src/functions/sleep';
 import { ScraperService } from '../scraper/scraper.service';
 
 @Injectable()
@@ -25,7 +23,7 @@ export class SenateService {
   private page: Page;
 
   async onApplicationBootstrap() {
-    this.getReports();
+    //this.getReports();
   }
 
   @Cron(`0 * * * *`)
