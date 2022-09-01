@@ -34,7 +34,7 @@ export class HouseService {
     await this.init();
     const records: Array<Report> = await this.paginateAndScrape();
     this.logger.log('Queueing Records for Processing');
-    const jobs = records.slice(0, 1).map(async (record) => {
+    const jobs = records.map(async (record) => {
       return this.reportQueue
         .add(record, {
           jobId: record.url,
@@ -171,6 +171,8 @@ export class HouseService {
       const btn = document.querySelector(selector) as HTMLElement;
       btn.click();
     }, nextSelector);
+
+    await this.page.waitForNetworkIdle({ idleTime: 25 });
   }
 
   private page: Page;

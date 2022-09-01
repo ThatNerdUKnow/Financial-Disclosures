@@ -13,6 +13,7 @@ export class DownloadService {
   constructor(
     private readonly db: PrismaService,
     @InjectQueue('pdf') private readonly pdfQueue: Queue<pdfJob>,
+    private readonly dbService: PrismaService,
   ) {}
 
   private readonly logger = new Logger(DownloadService.name);
@@ -23,11 +24,16 @@ export class DownloadService {
    */
   @Process()
   async process(job: Job<Report>) {
-    this.logger.debug(`Downloading ${job.data.url}`);
-
+    this.logger.debug(`Processing ${job.id}`);
     const found = await this.db.report.findUnique({
       where: { url: job.data.url },
     });
+
+    if (found) {
+      this.logger.warn(`${job.id} already exists`);
+      return;
+    }
+    this.logger.debug(`Downloading ${job.data.url}`);
 
     if (!found) {
       this.logger.verbose(`${job.id} does not already exist`);
@@ -62,6 +68,7 @@ export class DownloadService {
         baseName: basename,
       };
 
+      await this.dbService.report.create({ data: job.data });
       this.pdfQueue
         .add(pdfJob, { jobId: job.data.url })
         .then((job: Job) => {

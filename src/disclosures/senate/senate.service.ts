@@ -89,6 +89,12 @@ export class SenateService {
       reports.concat(await this.getEveryRecordOnPage());
       await this.advancePage();
     }
+
+    reports.forEach((report) => {
+      this.downloadQueue.add(report).then((job) => {
+        this.logger.verbose(`Successfully queued ${job.id}`);
+      });
+    });
   }
 
   async getPages(): Promise<number> {
