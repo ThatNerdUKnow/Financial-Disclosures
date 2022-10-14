@@ -1,0 +1,20 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Report {
+  url String @id @unique // URL of disclosure report
+  name  String // Name of representative
+  office String // Office held by representative
+  date String // Date of submission
+  type String // Financial Disclosure type
+  body String // Senate or House
+}
