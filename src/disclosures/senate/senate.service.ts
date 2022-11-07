@@ -26,7 +26,7 @@ export class SenateService {
     this.getReports();
   }
 
-  @Cron(`0 * * * *`)
+  @Cron(`0 8 * * *`)
   async getReports() {
     try {
       await this.init();
@@ -140,7 +140,7 @@ export class SenateService {
 
   async advancePage() {
     await this.page.click(this.PAGINATE_NEXT_SELECTOR);
-    await this.page.waitForNetworkIdle({ idleTime: 200 });
+    await this.page.waitForNetworkIdle({ idleTime: 10000 });
   }
 
   public readonly delay = (ms: number) =>
