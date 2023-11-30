@@ -33,9 +33,9 @@
     "bull": "^4.8.5",
     "imagemagick": "^0.1.3",
     "lodash": "^4.17.21",
-    "puppeteer": "^16.1.1",
+    "puppeteer": "^18.2.0",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.0.0",
     "rxjs": "^7.2.0",
     "twitter": "^1.7.1",
     "uuid": "^8.3.2"
